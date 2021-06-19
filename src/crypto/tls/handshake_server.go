@@ -370,21 +370,25 @@ func (hs *serverHandshakeState) checkForResumption() bool {
 
 	plaintext, usedOldKey := c.decryptTicket(hs.clientHello.sessionTicket)
 	if plaintext == nil {
+		fmt.Println("error tls resume: cannot descrypt ticket")
 		return false
 	}
 	hs.sessionState = &sessionState{usedOldKey: usedOldKey}
 	ok := hs.sessionState.unmarshal(plaintext)
 	if !ok {
+		fmt.Println("error tls resume: cannot unmarshal ticket")
 		return false
 	}
 
 	createdAt := time.Unix(int64(hs.sessionState.createdAt), 0)
 	if c.config.time().Sub(createdAt) > maxSessionTicketLifetime {
+		fmt.Println("error tls resume: ticket is too old", c.config.time().Sub(createdAt))
 		return false
 	}
 
 	// Never resume a session for a different TLS version.
 	if c.vers != hs.sessionState.vers {
+		fmt.Println("error tls resume: different TLS version", c.vers. h.sessionState.vers)
 		return false
 	}
 
@@ -397,6 +401,7 @@ func (hs *serverHandshakeState) checkForResumption() bool {
 		}
 	}
 	if !cipherSuiteOk {
+		fmt.Println("error tls resume: cipher suite not supported anymore")
 		return false
 	}
 
@@ -404,8 +409,11 @@ func (hs *serverHandshakeState) checkForResumption() bool {
 	hs.suite = selectCipherSuite([]uint16{hs.sessionState.cipherSuite},
 		c.config.cipherSuites(), hs.cipherSuiteOk)
 	if hs.suite == nil {
+		fmt.Println("error tls resume: server does not support cipher suite")
 		return false
 	}
+
+	fmt.Println("tls resume: lucas skipping certificate verifiction")
 
 	// sessionHasClientCerts := len(hs.sessionState.certificates) != 0
 	// needClientCerts := requiresClientCert(c.config.ClientAuth)
