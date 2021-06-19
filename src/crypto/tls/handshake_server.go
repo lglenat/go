@@ -370,7 +370,7 @@ func (hs *serverHandshakeState) checkForResumption() bool {
 
 	plaintext, usedOldKey := c.decryptTicket(hs.clientHello.sessionTicket)
 	if plaintext == nil {
-		fmt.Println("error tls resume: cannot descrypt ticket")
+		fmt.Println("tls resume: no ticket or cannot decrypt ticket")
 		return false
 	}
 	hs.sessionState = &sessionState{usedOldKey: usedOldKey}
@@ -435,6 +435,9 @@ func (hs *serverHandshakeState) doResumeHandshake() error {
 	// We echo the client's session ID in the ServerHello to let it know
 	// that we're doing a resumption.
 	hs.hello.sessionId = hs.clientHello.sessionId
+	// On a resumed handshake, we want to send a ticket only if a new STEK is used.
+	// Setting ticketSupported to usedOldKey is a hack that allows us to do this. 
+	// ticketSupported is "forced" to false when the same key is used, so that a new ticket is not sent.
 	hs.hello.ticketSupported = hs.sessionState.usedOldKey
 	hs.finishedHash = newFinishedHash(c.vers, hs.suite)
 	hs.finishedHash.discardHandshakeBuffer()
