@@ -388,7 +388,7 @@ func (hs *serverHandshakeState) checkForResumption() bool {
 
 	// Never resume a session for a different TLS version.
 	if c.vers != hs.sessionState.vers {
-		fmt.Println("error tls resume: different TLS version", c.vers. h.sessionState.vers)
+		fmt.Println("error tls resume: different TLS version", c.vers, hs.sessionState.vers)
 		return false
 	}
 
