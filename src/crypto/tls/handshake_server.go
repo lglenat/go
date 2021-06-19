@@ -727,7 +727,7 @@ func (hs *serverHandshakeState) sendSessionTicket() error {
 	m := new(newSessionTicketMsg)
 
 	createdAt := uint64(c.config.time().Unix())
-	if hs.sessionState != nil {
+	if hs.sessionState != nil && hs.sessionState.usedOldKey {
 		// If this is re-wrapping an old key, then keep
 		// the original time it was created.
 		createdAt = hs.sessionState.createdAt
