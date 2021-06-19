@@ -62,10 +62,11 @@ func (m *sessionState) unmarshal(data []byte) bool {
 		len(m.masterSecret) != 0; !ok {
 		return false
 	}
-	var certList cryptobyte.String
-	if !s.ReadUint24LengthPrefixed(&certList) {
-		return false
-	}
+	fmt.Println("unmarshalled ticket: %+v", m)
+	// var certList cryptobyte.String
+	// if !s.ReadUint24LengthPrefixed(&certList) {
+	// 	return false
+	// }
 	// for !certList.Empty() {
 	// 	var cert []byte
 	// 	if !readUint24LengthPrefixed(&certList, &cert) {
